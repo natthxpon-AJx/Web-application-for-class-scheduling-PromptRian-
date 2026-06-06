@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>เว็บจัดตารางเรียน</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="pastel">
+    <main id="authScreen" class="auth-shell">
+      <section class="auth-brand" aria-label="ชื่อแอป">
+        <div class="brand-mark">TT</div>
+        <h1>จัดตารางเรียน</h1>
+        <p>เรียน งาน ห้อง เวลา สี และช่วงว่าง อยู่ในมุมมองเดียว</p>
+      </section>
+
+      <section class="auth-panel" aria-label="เข้าสู่ระบบและสมัครสมาชิก">
+        <div class="auth-tabs" role="tablist" aria-label="เลือกฟอร์ม">
+          <button id="loginTab" class="tab-button active" type="button">เข้าสู่ระบบ</button>
+          <button id="registerTab" class="tab-button" type="button">สมัครสมาชิก</button>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            อีเมล
+            <input id="loginEmail" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            รหัสผ่าน
+            <input id="loginPassword" type="password" autocomplete="current-password" required />
+          </label>
+          <button class="primary-button" type="submit">เข้าสู่ระบบ</button>
+          <button id="demoButton" class="ghost-button" type="button">เข้าใช้งานตัวอย่าง</button>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <label>
+            ชื่อผู้ใช้
+            <input id="registerName" type="text" autocomplete="name" required />
+          </label>
+          <label>
+            อีเมล
+            <input id="registerEmail" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            รหัสผ่าน
+            <input id="registerPassword" type="password" autocomplete="new-password" minlength="4" required />
+          </label>
+          <button class="primary-button" type="submit">สร้างบัญชี</button>
+        </form>
+
+        <p id="authMessage" class="message" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <main id="appScreen" class="app-shell hidden">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Weekly Planner</p>
+          <h1>ตารางของฉัน</h1>
+        </div>
+        <div class="top-actions">
+          <span id="userBadge" class="user-badge"></span>
+          <button id="logoutButton" class="icon-text-button" type="button">ออกจากระบบ</button>
+        </div>
+      </header>
+
+      <section class="toolbar" aria-label="ตัวเลือกมุมมอง">
+        <div class="control-group">
+          <span class="control-label">ธีม</span>
+          <div class="segmented" role="group" aria-label="เลือกธีม">
+            <button class="segment active" data-theme-choice="pastel" type="button">พาสเทล</button>
+            <button class="segment" data-theme-choice="vivid" type="button">สดใส</button>
+            <button class="segment" data-theme-choice="dark" type="button">เข้ม</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <span class="control-label">ภาพพื้นหลัง</span>
+          <input id="backgroundInput" class="file-input" type="file" accept="image/*" />
+          <button id="clearBackgroundButton" class="ghost-button compact" type="button">ล้างภาพ</button>
+          <span id="backgroundStatus" class="background-status" aria-live="polite"></span>
+        </div>
+        <div class="control-group">
+          <span class="control-label">แสดงผล</span>
+          <select id="viewFilter">
+            <option value="all">รวมเรียนและงาน</option>
+            <option value="class">เฉพาะตารางเรียน</option>
+            <option value="work">เฉพาะงานอื่นๆ</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <span class="control-label">ขอบเขต</span>
+          <select id="scopeFilter">
+            <option value="active">ตารางปัจจุบัน</option>
+            <option value="all">ทุกตาราง</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <span class="control-label">รูปแบบตาราง</span>
+          <select id="orientationFilter">
+            <option value="vertical">วันแนวนอน / เวลาแนวตั้ง</option>
+            <option value="horizontal">วันแนวตั้ง / เวลาแนวนอน</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <span class="control-label">หัวตาราง</span>
+          <select id="headerLanguageFilter">
+            <option value="th">ภาษาไทย</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <span class="control-label">ช่วงวัน</span>
+          <input id="dayStartInput" type="time" value="07:00" />
+          <input id="dayEndInput" type="time" value="21:00" />
+        </div>
+        <div class="download-actions">
+          <button id="downloadImageButton" class="primary-button compact" type="button">ดาวน์โหลด PNG</button>
+          <button id="printPdfButton" class="ghost-button compact" type="button">บันทึก PDF</button>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <aside class="sidebar" aria-label="จัดการตารางและรายการ">
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>ตาราง</h2>
+            </div>
+            <div id="scheduleList" class="schedule-list"></div>
+            <form id="scheduleForm" class="inline-form">
+              <input id="scheduleNameInput" type="text" placeholder="ชื่อตารางใหม่" required />
+              <button class="primary-button compact" type="submit">เพิ่ม</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <h2 id="entryFormTitle">เพิ่มรายการ</h2>
+              <button id="cancelEditButton" class="ghost-button compact hidden" type="button">ยกเลิก</button>
+            </div>
+            <form id="entryForm" class="entry-form">
+              <label>
+                ชื่อรายวิชา/งาน
+                <input id="entryTitle" type="text" placeholder="เช่น คณิตศาสตร์, ประชุมทีม" required />
+              </label>
+              <label>
+                ประเภท
+                <select id="entryCategory">
+                  <option value="class">ตารางเรียน</option>
+                  <option value="work">ตารางงานอื่นๆ</option>
+                </select>
+              </label>
+              <label>
+                ตาราง
+                <select id="entrySchedule"></select>
+              </label>
+              <label>
+                วัน
+                <select id="entryDay"></select>
+              </label>
+              <div class="two-columns">
+                <label>
+                  เริ่ม
+                  <input id="entryStart" type="time" required />
+                </label>
+                <label>
+                  สิ้นสุด
+                  <input id="entryEnd" type="time" required />
+                </label>
+              </div>
+              <label>
+                ห้อง/สถานที่
+                <input id="entryRoom" type="text" placeholder="เช่น B402, ออนไลน์" />
+              </label>
+              <label>
+                รายละเอียด
+                <input id="entryNote" type="text" placeholder="ผู้สอน หมายเหตุ หรืองานที่ต้องทำ" />
+              </label>
+              <label>
+                สีรายการ
+                <input id="entryColor" type="color" value="#7c6cff" />
+              </label>
+              <div id="colorSwatches" class="color-swatches" aria-label="สีสำเร็จรูป"></div>
+              <button class="primary-button" type="submit">บันทึกรายการ</button>
+            </form>
+          </section>
+        </aside>
+
+        <section class="main-column">
+          <section id="captureArea" class="capture-area">
+            <div class="panel calendar-panel">
+              <div class="panel-heading calendar-heading">
+                <div>
+                  <h2 id="calendarTitle">ตารางเรียน</h2>
+                  <p id="calendarSubtitle" class="subtext"></p>
+                </div>
+                <div id="conflictCounter" class="counter-pill">0 ชนกัน</div>
+              </div>
+              <div class="calendar-scroll">
+                <div id="calendarGrid" class="calendar-grid" aria-label="ตารางรายสัปดาห์"></div>
+              </div>
+            </div>
+
+            <div class="summary-grid">
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>ช่วงเวลาว่าง</h2>
+                </div>
+                <div id="freeTimeList" class="free-time-list"></div>
+              </section>
+              <section class="panel">
+                <div class="panel-heading">
+                  <h2>รายการชนกัน</h2>
+                </div>
+                <div id="conflictList" class="conflict-list"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="panel entries-panel">
+            <div class="panel-heading">
+              <h2>รายการทั้งหมดในมุมมองนี้</h2>
+            </div>
+            <div id="entryList" class="entry-list"></div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
